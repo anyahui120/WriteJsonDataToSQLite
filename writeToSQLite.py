@@ -13,6 +13,7 @@ from os import listdir
 import os
 from collections import defaultdict
 
+# To convert any decoded JSON object from using unicode strings to UTF-8-encoded byte strings
 def _byteify(data, ignore_dicts = False):
     if isinstance(data, unicode):
         return data.encode('utf-8')
@@ -32,7 +33,9 @@ def json_loads_byteified(json_text):
     )
 
 
+# To write saved json data into SQLite database.
 
+# STEP1: Create tables: user, thread and post.
 conn = sqlite3.connect('/Users/anyahui/Applications/coursera.db')
 conn.text_factory = str
 c = conn.cursor()
@@ -97,7 +100,8 @@ c.execute('''CREATE TABLE `post` \
 ''')
 
 
-#
+# STEP2: Get data from files and insert it into target tables.
+#***********************************for users******************************#
 def getUsers(userFileName):
     filedata = open(userFileName,'r')
     count = 0
