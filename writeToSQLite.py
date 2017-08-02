@@ -8,13 +8,20 @@
 
 import json
 import sqlite3
+import yaml
 import time
 from os import listdir
 import os
 from collections import defaultdict
 
-# To convert any decoded JSON object from using unicode strings to UTF-8-encoded byte strings
+
 def _byteify(data, ignore_dicts = False):
+    """
+    To convert any decoded JSON object from using unicode strings to UTF-8-encoded byte strings
+    :param data: raw data in json files
+    :param ignore_dicts:
+    :return: byte string data
+    """
     if isinstance(data, unicode):
         return data.encode('utf-8')
     if isinstance(data, list):
@@ -34,75 +41,82 @@ def json_loads_byteified(json_text):
 
 
 # To write saved json data into SQLite database.
-
 # STEP1: Create tables: user, thread and post.
-conn = sqlite3.connect('/Users/anyahui/Applications/coursera.db')
-conn.text_factory = str
-c = conn.cursor()
-#***********************************for users******************************#
-c.execute('drop table if EXISTS user')
-c.execute('''CREATE TABLE `user` \
-( \
-'photoUrl' TEXT, \
-`courseId` TEXT, \
-`userId` INTEGER, \
-`id` TEXT, \
-`learnerId` INTEGER, \
-`courseRole` TEXT, \
-`fullName` TEXT, \
-'externalUserId' TEXT \
-); \
-''')
-c.execute('drop table if EXISTS thread')
-c.execute('''CREATE TABLE `thread` \
-('answerBadge' TEXT, \
-'hasResolved' INTEGER, \
-'instReplied' INTEGER, \
-'totalAnswerCount' INTEGER, \
-'isFollowing' INTEGER, \
-'forumId' TEXT, \
-`lastAnsweredAt` INTEGER, \
-`topLevelAnswerCount` INTEGER, \
-`isFlagged` INTEGER, \
-'lastAnsweredBy' INTEGER, \
-'state' TEXT, \
-'followCount' INTEGER, \
-'title' TEXT, \
-'content' TEXT, \
-'viewCount' INTEGER, \
-'sessionId' TEXT, \
-'creatorId' INTEGER, \
-'isUpvoted' INTEGER, \
-'id' TEXT, \
-'courseId' TEXT, \
-'threadId' TEXT, \
-'createdAt' INTEGER, \
-'upvoteCount' INTEGER \
-); \
-''')
-c.execute('drop table if EXISTS post')
-c.execute('''CREATE TABLE `post` \
-('parentForumAnswerId' TEXT, \
-'forumQuestionId' TEXT, \
-'isFlagged' INTEGER, \
-'order' INTEGER, \
-'content' TEXT, \
-'state' BLOB, \
-'childAnswerCount' INTEGER, \
-'creatorId' INTEGER, \
-'isUpvoted' INTEGER, \
-'id' TEXT, \
-'courseId' TEXT, \
-'postId' TEXT, \
-'createdAt' INTEGER, \
-'upvoteCount' INTEGER \
-); \
-''')
-
-
 # STEP2: Get data from files and insert it into target tables.
+
+def createTables(conn, c):
+    """
+    Create tables: user, thread and post.
+    :param conn: connection to target database
+    :param c: cursor of the connection
+    :return:
+    """
+
+    #***********************************for users******************************#
+    c.execute('drop table if EXISTS user')
+    c.execute('''CREATE TABLE `user` \
+    ( \
+    'photoUrl' TEXT, \
+    `courseId` TEXT, \
+    `userId` INTEGER, \
+    `id` TEXT, \
+    `learnerId` INTEGER, \
+    `courseRole` TEXT, \
+    `fullName` TEXT, \
+    'externalUserId' TEXT \
+    ); ''')
+    # ***********************************for threads******************************#
+    c.execute('drop table if EXISTS thread')
+    c.execute('''CREATE TABLE `thread` \
+    ('answerBadge' TEXT, \
+    'hasResolved' INTEGER, \
+    'instReplied' INTEGER, \
+    'totalAnswerCount' INTEGER, \
+    'isFollowing' INTEGER, \
+    'forumId' TEXT, \
+    `lastAnsweredAt` INTEGER, \
+    `topLevelAnswerCount` INTEGER, \
+    `isFlagged` INTEGER, \
+    'lastAnsweredBy' INTEGER, \
+    'state' TEXT, \
+    'followCount' INTEGER, \
+    'title' TEXT, \
+    'content' TEXT, \
+    'viewCount' INTEGER, \
+    'sessionId' TEXT, \
+    'creatorId' INTEGER, \
+    'isUpvoted' INTEGER, \
+    'id' TEXT, \
+    'courseId' TEXT, \
+    'threadId' TEXT, \
+    'createdAt' INTEGER, \
+    'upvoteCount' INTEGER \
+    ); \
+    ''')
+    # ***********************************for posts******************************#
+    c.execute('drop table if EXISTS post')
+    c.execute('''CREATE TABLE `post` \
+    ('parentForumAnswerId' TEXT, \
+    'forumQuestionId' TEXT, \
+    'isFlagged' INTEGER, \
+    'order' INTEGER, \
+    'content' TEXT, \
+    'state' BLOB, \
+    'childAnswerCount' INTEGER, \
+    'creatorId' INTEGER, \
+    'isUpvoted' INTEGER, \
+    'id' TEXT, \
+    'courseId' TEXT, \
+    'postId' TEXT, \
+    'createdAt' INTEGER, \
+    'upvoteCount' INTEGER \
+    ); \
+    ''')
+
+
+
 #***********************************for users******************************#
-def getUsers(userFileName):
+def getUsers(userFileName, conn, c):
     filedata = open(userFileName,'r')
     count = 0
     cols_in_database = ['photoUrl','courseId','userId','id','learnerId','courseRole','fullName','externalUserId']
@@ -130,7 +144,7 @@ def getUsers(userFileName):
     conn.commit()
 
 #***********************************for threads******************************#
-def getThread(threadFileName):
+def getThread(threadFileName, conn,c ):
     filedata = open(threadFileName,'r')
     count = 0
     cols_in_database = ['answerBadge','hasResolved','instReplied','totalAnswerCount','isFollowing', 'forumId' ,'lastAnsweredAt', 'topLevelAnswerCount', \
@@ -217,7 +231,7 @@ def getThread(threadFileName):
 
 
 #***********************************for posts******************************#
-def getPost(postFileName):
+def getPost(postFileName, conn, c):
     filedata = open(postFileName,'r')
     count = 0
 
@@ -277,25 +291,43 @@ def getPost(postFileName):
     conn.commit()
 
 
-path = '/Users/anyahui/Documents/CourseraDeepLearning/coursera data/'
-dirs = listdir(path)
-count = 0
-for dirName in dirs:
-    totalCourse = len(dirs)
-    count += 1
-    print "Processing %d...Total %d courses." %(count, totalCourse)
-    new_path = path + dirName + '/'
-    files = listdir(new_path)
-    for file in files:
-        if file == 'users.json':
-            userFileName = new_path + file
-            #print userFileName
-        elif file == 'threads.json':
-            threadFileName = new_path + file
-        elif file == 'posts.json':
-            postFileName = new_path + file
-    getUsers(userFileName)
-    getThread(threadFileName)
-    getPost(postFileName)
-conn.close()
+if __name__ == "__main__":
+
+    with open('config.yml') as f:
+        config = yaml.load(f)
+    dbPath = config['dbPath']
+    filePath = config['filePath']
+    f.close()
+
+    conn = sqlite3.connect(dbPath)
+    conn.text_factory = str
+    c = conn.cursor()
+    createTables(conn, c)
+
+    dirs = listdir(filePath)
+    count = 0
+    for dirName in dirs:
+        totalCourse = len(dirs)
+        count += 1
+        print "Processing %d...Total %d courses." %(count, totalCourse)
+        new_path = filePath + dirName + '/'
+        files = listdir(new_path)
+        userFileName = ''
+        threadFileName = ''
+        postFileName = ''
+        for file in files:
+            if file == 'users.json':
+                userFileName = new_path + file
+                #print userFileName
+            elif file == 'threads.json':
+                threadFileName = new_path + file
+            elif file == 'posts.json':
+                postFileName = new_path + file
+        getUsers(userFileName, conn, c)
+        print "Writing users OK!"
+        getThread(threadFileName, conn, c)
+        print "Writing threads OK!"
+        getPost(postFileName, conn, c)
+        print "Writing posts OK!"
+    conn.close()
 

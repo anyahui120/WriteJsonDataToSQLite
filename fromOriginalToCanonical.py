@@ -6,12 +6,15 @@
 # @File    : writeToSQLite.py
 # @Software: PyCharm
 
-import json
 import sqlite3
-import time
-from os import listdir
+import yaml
 
-conn = sqlite3.connect('/Users/anyahui/Applications/coursera.db')
+with open('config.yml') as f:
+    config = yaml.load(f)
+dbPath = config['dbPath']
+f.close()
+
+conn = sqlite3.connect(dbPath)
 conn.text_factory = str
 c = conn.cursor()
 #***********************************for users******************************#
