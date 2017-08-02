@@ -1,0 +1,11 @@
+Tables to save the raw data:
+
+CREATE TABLE `user` ( 'photoUrl' TEXT, `courseId` TEXT, `userId` INTEGER, `id` TEXT, `learnerId` INTEGER, `courseRole` TEXT, `fullName` TEXT, 'externalUserId' TEXT )
+CREATE TABLE `thread` ('answerBadge' TEXT, 'hasResolved' INTEGER, 'instReplied' INTEGER, 'totalAnswerCount' INTEGER, 'isFollowing' INTEGER, 'forumId' TEXT, `lastAnsweredAt` INTEGER, `topLevelAnswerCount` INTEGER, `isFlagged` INTEGER, 'lastAnsweredBy' INTEGER, 'state' TEXT, 'followCount' INTEGER, 'title' TEXT, 'content' TEXT, 'viewCount' INTEGER, 'sessionId' TEXT, 'creatorId' INTEGER, 'isUpvoted' INTEGER, 'id' TEXT, 'courseId' TEXT, 'threadId' TEXT, 'createdAt' INTEGER, 'upvoteCount' INTEGER )
+CREATE TABLE `post` ('parentForumAnswerId' TEXT, 'forumQuestionId' TEXT, 'isFlagged' INTEGER, 'order' INTEGER, 'content' TEXT, 'state' BLOB, 'childAnswerCount' INTEGER, 'creatorId' INTEGER, 'isUpvoted' INTEGER, 'id' TEXT, 'courseId' TEXT, 'postId' TEXT, 'createdAt' INTEGER, 'upvoteCount' INTEGER )
+
+Canonical tables:
+CREATE TABLE user_new ( id integer, full_name text, anonymous integer, user_profile text, user_title text, postid text, threadid text, forumid text, courseid text )
+CREATE TABLE thread_new ( id text, title text, url text, num_views integer, num_posts integer, has_resolved integer, inst_replied integer, is_spam integer, stickied integer, starter integer, last_poster integer, votes integer, courseid text, forumid text, errorflag int, tagids, docid integer, resolved, deleted, approved, posted_time integer, primary key(url))
+CREATE TABLE post_new( id text, thread_id text, original integer, post_order integer, url text, post_text text, votes integer, user integer, post_time real, forumid text, courseid text, errorflag int, primary key(id,thread_id,forumid,courseid))
+CREATE TABLE comment_new( id text, post_id text, thread_id text, forumid text, url text, comment_text text, votes integer, user integer, post_time integer, user_name text, courseid text, primary key(id,thread_id,forumid,courseid))
