@@ -4,3 +4,5 @@ UserId: 105956
 filePath: ../data/
 activeCoursePageNum: 1
 inactiveCoursePageNum: 25
+dbPath: '/Users/anyahui/Applications/coursera.db'
+filePath: './data/'
