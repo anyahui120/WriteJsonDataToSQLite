@@ -16,6 +16,8 @@ STEP3: Some supplement for each canonical table.
     python transferFromTables.py
 
 Please set your PATH of your database and your json data files in <a href = "https://github.com/anyahui120/WriteJsonDataToSQLite/blob/master/config.yml">config.yml</a>. 
+
     1. Please save all the data in one directory '/data/' or create a directory you prefer(remember to set it in the config.yml).
+    
     2. Please create a new database and set the path in config.yml.
 
