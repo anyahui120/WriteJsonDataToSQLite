@@ -1,11 +1,18 @@
 # WriteJsonDataToSQLite
 Write the crawled coursera discussion forum data to SQLite 
 
-My source data is json data crawled via hidden APIs in Coursera platform.
+My source data(saved in '/data/') is json data crawled via hidden APIs in Coursera platform.
 
-1. Write json data into SQLite originally;
-2. Transfer from Original To Canonical database;
-3. Update the information between tables(there are some intersection between table, depend on the design);
-4. Crawling the forum data for the forum table;
-5. Insert the forum data into the forum table.
+STEP1: Write crawled raw data(saved in json files) into SQLite tables: user, thread and post.(writeToSQLite.py)
 
+    python writeToSQLite.py
+
+STEP2: Write raw data into canonical tables(design scheme from <a href= "https://github.com/cmkumar87">Muthu</a>).
+
+    python fromOriginalToCanonical.py
+
+STEP3: Some supplement for each canonical table.
+
+    python transferFromTables.py
+
+Please set your PATH of your database and your json data files in <a href = "https://github.com/anyahui120/WriteJsonDataToSQLite/blob/master/config.yml">config.yml</a>.
